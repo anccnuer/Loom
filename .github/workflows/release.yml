@@ -1,0 +1,70 @@
+name: Release
+
+# 推送形如 v1.0.0 的 tag 时：交叉编译 windows/linux 的 amd64 二进制，并发布 GitHub Release
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # 创建 Release、上传产物所需
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: windows
+            goarch: amd64
+            name: windows-amd64
+            ext: ".exe"
+          - goos: linux
+            goarch: amd64
+            name: linux-amd64
+            ext: ""
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod # 与仓库内 go.mod 声明的版本保持一致
+
+      - name: Build loom-${{ matrix.name }}
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0" # 纯 Go 依赖，关闭 CGO 以便交叉编译
+        run: |
+          mkdir -p dist
+          go build -trimpath -ldflags "-s -w" -o dist/loom-${{ matrix.name }}${{ matrix.ext }} .
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.name }}
+          path: dist/loom-*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-windows-amd64
+          path: dist
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-linux-amd64
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Loom ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/loom-windows-amd64.exe
+            dist/loom-linux-amd64
