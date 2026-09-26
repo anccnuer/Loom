@@ -1,0 +1,15 @@
+# 构建产物（任意层级的可执行文件）
+*.exe
+*.exe~
+*.dll
+/loom
+/loom.exe
+
+# 运行期文件
+*.log
+
+# 本地配置覆盖
+config.local.toml
+
+# 系统
+.DS_Store

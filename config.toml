@@ -1,0 +1,14 @@
+listen    = ":8080"
+backend   = "192.168.1.10:25565"
+brand     = "Loom"
+version   = "1.0.0"
+max_players = 100
+motd = ["§bEaglercraft 服务器", "§7Powered by Loom"]
+
+# 游戏协议协商范围（47=1.8.9, 110=1.12.2, 770=1.21.x）
+min_game_protocol = 4
+max_game_protocol = 770
+# 状态 ping（MOTD 查询）上报给后端的协议号
+status_protocol = 110
+
+login_timeout_seconds = 30
