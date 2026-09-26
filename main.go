@@ -10,7 +10,8 @@ import (
 	"time"
 )
 
-const versionString = "1.0.0"
+// 编译期可通过 -ldflags "-X main.versionString=<tag>" 注入；默认 dev 便于本地未注入时识别。
+var versionString = "dev"
 
 const appName = "Loom"
 

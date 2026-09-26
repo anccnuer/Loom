@@ -37,7 +37,8 @@ jobs:
           CGO_ENABLED: "0" # 纯 Go 依赖，关闭 CGO 以便交叉编译
         run: |
           mkdir -p dist
-          go build -trimpath -ldflags "-s -w" -o dist/loom-${{ matrix.name }}${{ matrix.ext }} .
+          VERSION="${GITHUB_REF_NAME#v}" # 去掉 tag 前缀 v，注入如 1.0.0
+          go build -trimpath -ldflags "-s -w -X main.versionString=${VERSION}" -o dist/loom-${{ matrix.name }}${{ matrix.ext }} .
           ls -l dist
 
       - uses: actions/upload-artifact@v4
